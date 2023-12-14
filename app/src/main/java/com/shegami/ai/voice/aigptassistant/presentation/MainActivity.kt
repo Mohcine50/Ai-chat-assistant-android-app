@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                             SplashScreen(navController = navController)
                         }
                         composable(route = Screen.GenerateScreen.route) {
-                            GenerateScreen(navController = navController)
+                            GenerateScreen()
                         }
 
                     }

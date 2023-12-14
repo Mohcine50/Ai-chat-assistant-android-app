@@ -3,16 +3,13 @@ package com.shegami.ai.voice.aigptassistant.presentation.generate.components
 import androidx.compose.runtime.*
 import android.annotation.SuppressLint
 import android.os.Build.VERSION.SDK_INT
-import android.util.Size
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,49 +17,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
-import coil.request.ImageRequest
 import com.shegami.ai.voice.aigptassistant.R
-import com.shegami.ai.voice.aigptassistant.data.remote.request_body.Message
 import com.shegami.ai.voice.aigptassistant.presentation.generate.GenerateEvent
 import com.shegami.ai.voice.aigptassistant.presentation.generate.GenerateViewModel
-import com.shegami.ai.voice.aigptassistant.presentation.util.Screen
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun GenerateScreen(
-    navController: NavController,
     viewModel: GenerateViewModel = hiltViewModel()
 ) {
 
@@ -99,8 +82,7 @@ fun GenerateScreen(
             )
 
             Text(
-                //text = "Assistant",
-                text = state.recording.toString(),
+                text = "Assistant",
                 modifier = Modifier.fillMaxWidth(),
                 color = Color.Black,
                 fontSize = 22.sp
@@ -128,7 +110,7 @@ fun GenerateScreen(
             ) {
 
                 // This stop button is for stopping the text type writing animation
-                // TODO: add typewriting animation and complete the iplementation
+                // TODO: add typewriting animation and complete the implementation
                 Button(
                     onClick = {
                     },
@@ -145,51 +127,57 @@ fun GenerateScreen(
                     )
                 }
 
-                if (state.recording) {
-                    Button(
-                        onClick = {
-                            viewModel.onEvent(
-                                GenerateEvent.GenerateResponseEvent(
-                                    state.prompt ?: "", state.messages
-                                )
-                            )
-                        },
-                        //contentPadding = PaddingValues(horizontal = 20.dp, vertical = 15.dp)
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        )
-                    ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                ImageRequest.Builder(LocalContext.current)
-                                    .data(data = R.drawable.voice_loading)
-                                    .build(),
-                                imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.size(80.dp)
-                        )
-                    }
-                } else {
-                    Button(
-                        onClick = {
-                            viewModel.onEvent(GenerateEvent.Record)
-                        },
-                        //contentPadding = PaddingValues(horizontal = 20.dp, vertical = 15.dp)
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        )
-                    ) {
-                        Image(
-                            painterResource(R.drawable.recording_icon),
-                            contentDescription = "intro",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.size(80.dp)
-                        )
-                    }
+                /** if (state?.recording == true) {
+                Button(
+                onClick = {
+                viewModel?.onEvent(
+                GenerateEvent.GenerateResponseEvent(
+                state?.prompt ?: "", state.messages
+                )
+                )
+                },
+                //contentPadding = PaddingValues(horizontal = 20.dp, vertical = 15.dp)
+                colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent
+                )
+                ) {
+                Image(
+                painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                .data(data = R.drawable.voice_loading)
+                .build(),
+                imageLoader = imageLoader
+                ),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(80.dp)
+                )
                 }
+                } else {
+                Button(
+                onClick = {
+                viewModel?.onEvent(GenerateEvent.Record)
+                },
+                //contentPadding = PaddingValues(horizontal = 20.dp, vertical = 15.dp)
+                colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent
+                )
+                ) {
+                Image(
+                painterResource(R.drawable.recording_icon),
+                contentDescription = "intro",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(80.dp)
+                )
+                }
+                }*/
 
+                MessageInput(
+                    text = state.prompt ?: "",
+                    onValueChange = {},
+                    onFocusChange = {},
+                    modifier = Modifier.weight(2f)
+                )
 
                 Button(
                     onClick = {
@@ -198,7 +186,7 @@ fun GenerateScreen(
                         )
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (state.messages.isEmpty() == true) Color(0xFFA3A3A3) else Color(
+                        containerColor = if (state.messages.isEmpty()) Color(0xFFA3A3A3) else Color(
                             0xFF34d399
                         ),
                     ),
