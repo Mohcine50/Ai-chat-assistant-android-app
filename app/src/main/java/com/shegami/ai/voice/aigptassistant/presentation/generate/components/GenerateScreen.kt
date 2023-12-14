@@ -99,8 +99,7 @@ fun GenerateScreen(
             )
 
             Text(
-                //text = "Assistant",
-                text = state.recording.toString(),
+                text = "Assistant",
                 modifier = Modifier.fillMaxWidth(),
                 color = Color.Black,
                 fontSize = 22.sp
