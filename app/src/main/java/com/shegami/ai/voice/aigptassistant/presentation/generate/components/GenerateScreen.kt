@@ -79,30 +79,6 @@ fun GenerateScreen(
         }
         .build()
 
-    val messages: List<Message> = listOf(
-        Message(role = "user", content = "How are you?"),
-        Message(role = "assistant", content = "I'm fine, How may I help you today."),
-        Message(role = "user", content = "create an image of a dog playing with a cat"),
-        Message(
-            role = "assistant",
-            content = "https://storage.googleapis.com/pai-images/ae74b3002bfe4b538493ca7aedb6a300.jpeg"
-        ),
-        Message(role = "user", content = "create an image of a dog playing with a cat"),
-        Message(
-            role = "assistant",
-            content = "https://storage.googleapis.com/pai-images/ae74b3002bfe4b538493ca7aedb6a300.jpeg"
-        ),
-        Message(role = "user", content = "create an image of a dog playing with a cat"),
-        Message(
-            role = "assistant",
-            content = "https://storage.googleapis.com/pai-images/ae74b3002bfe4b538493ca7aedb6a300.jpeg"
-        ),
-        Message(role = "user", content = "create an image of a dog playing with a cat"),
-        Message(
-            role = "assistant",
-            content = "https://storage.googleapis.com/pai-images/ae74b3002bfe4b538493ca7aedb6a300.jpeg"
-        )
-    )
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -151,6 +127,8 @@ fun GenerateScreen(
                     .fillMaxWidth()
             ) {
 
+                // This stop button is for stopping the text type writing animation
+                // TODO: add typewriting animation and complete the iplementation
                 Button(
                     onClick = {
                     },
@@ -216,10 +194,7 @@ fun GenerateScreen(
                 Button(
                     onClick = {
                         viewModel.onEvent(
-                            GenerateEvent.GenerateResponseEvent(
-                                prompt = "generate an image of witcher riding a brown horse",
-                                messages = state.messages
-                            )
+                            GenerateEvent.ClearMessages
                         )
                     },
                     colors = ButtonDefaults.buttonColors(
