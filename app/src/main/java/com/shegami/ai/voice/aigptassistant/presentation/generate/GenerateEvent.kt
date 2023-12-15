@@ -7,5 +7,5 @@ sealed class GenerateEvent {
         GenerateEvent()
 
     object ClearMessages : GenerateEvent()
-    object Record : GenerateEvent()
+    data class InputPrompt(val prompt: String) : GenerateEvent()
 }

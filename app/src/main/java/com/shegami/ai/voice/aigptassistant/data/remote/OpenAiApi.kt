@@ -1,7 +1,6 @@
 package com.shegami.ai.voice.aigptassistant.data.remote
 
 import com.shegami.ai.voice.aigptassistant.common.Constants.OPENAI_API_KEY
-import com.shegami.ai.voice.aigptassistant.common.Constants.ORGANIZATION_ID
 import com.shegami.ai.voice.aigptassistant.data.remote.dto.ChatCompletionDto
 import com.shegami.ai.voice.aigptassistant.data.remote.dto.ImageGenerationDto
 import com.shegami.ai.voice.aigptassistant.data.remote.request_body.RequestBody

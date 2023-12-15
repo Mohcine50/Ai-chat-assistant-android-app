@@ -8,6 +8,7 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
@@ -35,17 +36,6 @@ class GenerateViewModel @Inject constructor(
     private val _state = mutableStateOf(GenerateState())
     val state: State<GenerateState> = _state
 
-    private val speechRecognizer: SpeechRecognizer by lazy {
-        SpeechRecognizer.createSpeechRecognizer(
-            context,
-            ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService")
-        )
-    }
-
-
-    init {
-        setupSpeechRecognizer()
-    }
 
     fun onEvent(event: GenerateEvent) {
 
@@ -56,9 +46,10 @@ class GenerateViewModel @Inject constructor(
                 //if (_state.value.prompt?.isNotBlank() == true) {
                 Log.d("GENERATE", "GENERATING")
                 _state.value = state.value.copy(
-                    messages = _state.value.messages + Message(event.prompt, "user")
+                    messages = _state.value.messages + Message(event.prompt, "user"),
+                    prompt = ""
                 )
-                Log.d("MESSAGES", _state.value.toString())
+                Log.d("MESSAGES", _state.value.messages.toString())
                 generateResponse(event.prompt, event.messages).onEach { result ->
                     when (result) {
                         is Resource.Loading -> {
@@ -74,6 +65,7 @@ class GenerateViewModel @Inject constructor(
 
                         is Resource.Error -> {
                             Log.d("GENERATE", result.message.toString())
+                            Toast.makeText(context, "Please try again!", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }.launchIn(viewModelScope)
@@ -86,88 +78,15 @@ class GenerateViewModel @Inject constructor(
                 _state.value = GenerateState(messages = emptyList())
             }
 
-            is GenerateEvent.Record -> {
-                viewModelScope.launch {
-                    Log.d("RECORD", "RECORDING")
-                    startSpeechRecognition()
-                }
+            is GenerateEvent.InputPrompt -> {
+                _state.value = state.value.copy(
+                    prompt = event.prompt
+                )
             }
 
         }
 
     }
 
-    private fun startSpeechRecognition() {
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        intent.putExtra(
-            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-        )
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US")
-        speechRecognizer.startListening(intent)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        speechRecognizer.destroy()
-    }
-
-    private fun stopSpeechRecognition() {
-        speechRecognizer.stopListening()
-    }
-
-    private fun setupSpeechRecognizer() {
-
-        speechRecognizer.setRecognitionListener(object : RecognitionListener {
-            override fun onReadyForSpeech(params: Bundle?) {
-            }
-
-            override fun onBeginningOfSpeech() {
-                Log.d("RECORD", "onBeginningOfSpeech")
-                _state.value = state.value.copy(
-                    recording = true
-                )
-            }
-
-            override fun onRmsChanged(rmsdB: Float) {
-            }
-
-            override fun onBufferReceived(buffer: ByteArray?) {
-            }
-
-            override fun onEndOfSpeech() {
-                Log.d("RECORD", "onEndOfSpeech")
-                _state.value = state.value.copy(
-                    recording = false
-                )
-            }
-
-            override fun onError(error: Int) {
-                Log.d("ERROR", error.toString())
-            }
-
-            override fun onResults(results: Bundle?) {
-
-                val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                matches?.firstOrNull()?.let {
-                    _state.value = _state.value.copy(
-                        prompt = it
-                    )
-                    _state.value = state.value.copy(
-                        messages = _state.value.messages + Message(it, "user")
-                    )
-                }
-
-            }
-
-            override fun onPartialResults(partialResults: Bundle?) {
-            }
-
-            override fun onEvent(eventType: Int, params: Bundle?) {
-            }
-
-        })
-
-    }
 
 }

@@ -15,20 +15,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +49,7 @@ import com.shegami.ai.voice.aigptassistant.presentation.generate.GenerateEvent
 import com.shegami.ai.voice.aigptassistant.presentation.generate.GenerateViewModel
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun GenerateScreen(
@@ -51,6 +58,8 @@ fun GenerateScreen(
 
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
+
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val imageLoader = ImageLoader.Builder(LocalContext.current)
         .components {
@@ -109,23 +118,29 @@ fun GenerateScreen(
                     .fillMaxWidth()
             ) {
 
-                // This stop button is for stopping the text type writing animation
-                // TODO: add typewriting animation and complete the implementation
                 Button(
                     onClick = {
+                        viewModel.onEvent(
+                            GenerateEvent.ClearMessages
+                        )
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFF87171),
+                        containerColor = if (state.messages.isEmpty()) Color(0xFFA3A3A3) else Color(
+                            0xFF34d399
+                        ),
                     ),
                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 7.dp)
                 ) {
+
                     Text(
-                        text = "STOP",
+                        text = "CLEAR",
                         textAlign = TextAlign.Center,
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
+
                 }
+
 
                 /** if (state?.recording == true) {
                 Button(
@@ -172,34 +187,47 @@ fun GenerateScreen(
                 }
                 }*/
 
+                Spacer(modifier = Modifier.width(5.dp))
                 MessageInput(
-                    text = state.prompt ?: "",
-                    onValueChange = {},
+                    text = state.prompt,
+                    onValueChange = {
+                        viewModel.onEvent(GenerateEvent.InputPrompt(prompt = it))
+                    },
                     onFocusChange = {},
+                    singleLine = true,
                     modifier = Modifier.weight(2f)
                 )
-
+                Spacer(modifier = Modifier.width(5.dp))
+                // This stop button is for stopping the text type writing animation
+                // TODO: add typewriting animation and complete the implementation
+                // NOTE: Changed to submit button on input interface
                 Button(
                     onClick = {
                         viewModel.onEvent(
-                            GenerateEvent.ClearMessages
+                            GenerateEvent.GenerateResponseEvent(
+                                prompt = state.prompt,
+                                messages = state.messages,
+                            ),
                         )
+                        keyboardController?.hide()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (state.messages.isEmpty()) Color(0xFFA3A3A3) else Color(
-                            0xFF34d399
-                        ),
+                        containerColor = Color(0xFF34d399),
+                        disabledContainerColor = Color(0xFF34d39),
                     ),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 7.dp)
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 7.dp),
+                    enabled = state.prompt.trim().length > 5,
                 ) {
-
-                    Text(
-                        text = "CLEAR",
-                        textAlign = TextAlign.Center,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
+                    Icon(
+                        imageVector = Icons.Default.Send,
+                        contentDescription = "submit"
                     )
-
+                    /** Text(
+                    text = "STOP",
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                    ) */
                 }
 
             }
